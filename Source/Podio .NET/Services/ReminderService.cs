@@ -3,11 +3,11 @@ namespace PodioAPI.Services
 {
     public class ReminderService
     {
-        private readonly Podio  _podio;
+        private readonly Podio _podio;
 
         public ReminderService(Podio currentInstance)
         {
-             _podio = currentInstance;
+            _podio = currentInstance;
         }
 
         /// <summary>
@@ -20,8 +20,8 @@ namespace PodioAPI.Services
         public async Task<int> GetReminder(string refType, int refId)
         {
             string url = string.Format("/reminder/{0}/{1}", refType, refId);
-            dynamic response =  await _podio.Get<dynamic>(url);
-            return (int) response["remind_delta"];
+            dynamic response = await _podio.Get<dynamic>(url);
+            return (int)response["remind_delta"];
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace PodioAPI.Services
         public async Task<dynamic> DeleteReminder(string refType, int refId, int reminderId)
         {
             string url = string.Format("/reminder/{0}/{1}?reminder_id={2}", refType, refId, reminderId);
-            return  await _podio.Delete<dynamic>(url);
+            return await _podio.Delete<dynamic>(url);
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace PodioAPI.Services
         public async Task<dynamic> SnoozeReminder(string refType, int refId, int reminderId)
         {
             string url = string.Format("/reminder/{0}/{1}/snooze?reminder_id={2}", refType, refId, reminderId);
-            return  await _podio.Post<dynamic>(url);
+            return await _podio.Post<dynamic>(url);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace PodioAPI.Services
             {
                 remind_delta = remindDelta
             };
-            return  await _podio.Put<dynamic>(url, requestData);
+            return await _podio.Put<dynamic>(url, requestData);
         }
     }
 }

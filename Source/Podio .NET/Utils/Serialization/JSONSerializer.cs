@@ -6,12 +6,14 @@ namespace PodioAPI.Utils
 {
     internal class JSONSerializer
     {
+        private static JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore
+        };
+
         public static string Serilaize(object entity)
         {
-            var settings = new JsonSerializerSettings();
-            settings.NullValueHandling = NullValueHandling.Ignore;
-
-            return JsonConvert.SerializeObject(entity, settings);
+            return JsonConvert.SerializeObject(entity, JsonSerializerSettings);
         }
 
         public static T Deserialize<T>(string json)

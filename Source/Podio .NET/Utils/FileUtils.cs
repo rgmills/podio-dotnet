@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.IO;
 using System.Threading.Tasks;
 
 namespace PodioAPI.Utils
@@ -31,6 +27,11 @@ namespace PodioAPI.Utils
                 }
             }
             return bytes;
+        }
+
+        internal static Stream GetAsyncFileStream(string path)
+        {
+            return new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true);
         }
     }
 }

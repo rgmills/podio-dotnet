@@ -20,10 +20,10 @@ namespace PodioAPI.Services
         /// </summary>
         /// <param name="fileId"></param>
         /// <returns></returns>
-        public async Task<ImporterInfo> GetInfo(int fileId)
+        public Task<ImporterInfo> GetInfo(int fileId)
         {
             string url = string.Format("/importer/{0}/info", fileId);
-            return await _podio.Get<ImporterInfo>(url);
+            return  _podio.Get<ImporterInfo>(url);
         }
 
         /// <summary>
@@ -79,14 +79,14 @@ namespace PodioAPI.Services
         /// <param name="row"></param>
         /// <param name="mappings"></param>
         /// <returns></returns>
-        public async Task<RowPreview> GetPreview(int fileId, string row, List<ImportMappingField> mappings)
+        public Task<RowPreview> GetPreview(int fileId, string row, List<ImportMappingField> mappings)
         {
             string url = string.Format("/importer/{0}/preview/{1}", fileId, row);
             dynamic requestData = new
             {
                 mappings = mappings
             };
-            return await _podio.Post<RowPreview>(url, requestData);
+            return  _podio.Post<RowPreview>(url, requestData);
         }
     }
 }

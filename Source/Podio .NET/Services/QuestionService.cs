@@ -19,14 +19,14 @@ namespace PodioAPI.Services
         /// </summary>
         /// <param name="questionId"></param>
         /// <param name="questionOptionId"></param>
-        public async Task<dynamic> AnswerQuestion(int questionId, int questionOptionId)
+        public Task<dynamic> AnswerQuestion(int questionId, int questionOptionId)
         {
             string url = string.Format("/question/{0}/", questionId);
             dynamic requestData = new
             {
                 question_option_id = questionOptionId
             };
-             return await _podio.Post<dynamic>(url, requestData);
+             return  _podio.Post<dynamic>(url, requestData);
         }
 
         /// <summary>
@@ -35,10 +35,10 @@ namespace PodioAPI.Services
         /// </summary>
         /// <param name="questionId"></param>
         /// <returns></returns>
-        public async Task<List<Answer>> GetAnswers(int questionId)
+        public Task<List<Answer>> GetAnswers(int questionId)
         {
             string url = string.Format("/question/{0}/", questionId);
-            return  await _podio.Get<List<Answer>>(url);
+            return _podio.Get<List<Answer>>(url);
         }
 
         /// <summary>

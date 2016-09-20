@@ -40,10 +40,10 @@ namespace PodioAPI.Services
         ///     <para>Podio API Reference: https://developers.podio.com/doc/integrations/delete-integration-86876 </para>
         /// </summary>
         /// <param name="appId"></param>
-        public async Task<dynamic> DeleteIntegration(int appId)
+        public Task<dynamic> DeleteIntegration(int appId)
         {
             string url = string.Format("/integration/{0}", appId);
-            return await  _podio.Delete<dynamic>(url);
+            return   _podio.Delete<dynamic>(url);
         }
 
         /// <summary>
@@ -52,10 +52,10 @@ namespace PodioAPI.Services
         /// </summary>
         /// <param name="appId"></param>
         /// <returns></returns>
-        public async Task<List<IntegrationAvailableAppField>> GetAvailableFields(int appId)
+        public Task<List<IntegrationAvailableAppField>> GetAvailableFields(int appId)
         {
             string url = string.Format("/integration/{0}/field/", appId);
-            return await  _podio.Get<List<IntegrationAvailableAppField>>(url);
+            return   _podio.Get<List<IntegrationAvailableAppField>>(url);
         }
 
         /// <summary>
@@ -64,10 +64,10 @@ namespace PodioAPI.Services
         /// </summary>
         /// <param name="appId"></param>
         /// <returns></returns>
-        public async Task<Integration> GetIntegration(int appId)
+        public Task<Integration> GetIntegration(int appId)
         {
             string url = string.Format("/integration/{0}", appId);
-            return await  _podio.Get<Integration>(url);
+            return   _podio.Get<Integration>(url);
         }
 
         /// <summary>
@@ -75,10 +75,10 @@ namespace PodioAPI.Services
         ///     <para>Podio API Reference: https://developers.podio.com/doc/integrations/refresh-integration-86987 </para>
         /// </summary>
         /// <param name="appId"></param>
-        public async Task<dynamic> RefreshIntegration(int appId)
+        public Task<dynamic> RefreshIntegration(int appId)
         {
             string url = string.Format("/integration/{0}/refresh", appId);
-            return await  _podio.Post<dynamic>(url);
+            return   _podio.Post<dynamic>(url);
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace PodioAPI.Services
         /// <param name="appId"></param>
         /// <param name="silent"></param>
         /// <param name="config"></param>
-        public async Task<dynamic> UpdateIntegration(int appId, bool? silent, dynamic config)
+        public Task<dynamic> UpdateIntegration(int appId, bool? silent, dynamic config)
         {
             string url = string.Format("/integration/{0}", appId);
             dynamic requestData = new
@@ -96,7 +96,7 @@ namespace PodioAPI.Services
                 silent = silent,
                 config = config
             };
-            return await  _podio.Put<dynamic>(url, requestData);
+            return   _podio.Put<dynamic>(url, requestData);
         }
 
         /// <summary>
@@ -105,10 +105,10 @@ namespace PodioAPI.Services
         /// </summary>
         /// <param name="appId"></param>
         /// <param name="fields"> Field id and the external id for the given field id</param>
-        public async Task<dynamic> UpdateIntegrationMapping(int appId, Dictionary<int, string> fields)
+        public Task<dynamic> UpdateIntegrationMapping(int appId, Dictionary<int, string> fields)
         {
             string url = string.Format("/integration/{0}/mapping", appId);
-            return await  _podio.Put<dynamic>(url, fields);
+            return   _podio.Put<dynamic>(url, fields);
         }
     }
 }

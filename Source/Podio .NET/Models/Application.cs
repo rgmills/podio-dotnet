@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
-using PodioAPI.Utils.ApplicationFields;
-using System.Reflection;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using PodioAPI.Utils.ApplicationFields;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace PodioAPI.Models
 {

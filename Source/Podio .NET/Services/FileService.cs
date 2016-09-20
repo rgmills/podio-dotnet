@@ -21,10 +21,10 @@ namespace PodioAPI.Services
         /// </summary>
         /// <param name="fileId"></param>
         /// <returns></returns>
-        public async Task<FileAttachment> GetFile(int fileId)
+        public Task<FileAttachment> GetFile(int fileId)
         {
             string url = string.Format("/file/{0}", fileId);
-            return await _podio.Get<FileAttachment>(url);
+            return _podio.Get<FileAttachment>(url);
         }
 
         /// <summary>
@@ -38,10 +38,12 @@ namespace PodioAPI.Services
         {
             if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
             {
-                byte[] data = await FileUtils.ReadAllBytesAsync(filePath);
-                string mimeType = MimeTypeMapping.GetMimeType(Path.GetExtension(filePath));
+                using (var data = FileUtils.GetAsyncFileStream(filePath))
+                {
+                    string mimeType = MimeTypeMapping.GetMimeType(Path.GetExtension(filePath));
 
-                return await UploadFile(fileName, data, mimeType);
+                    return await UploadFile(fileName, data, mimeType);
+                }
             }
             else
             {
@@ -57,16 +59,24 @@ namespace PodioAPI.Services
         /// <param name="data"></param>
         /// <param name="mimeType"></param>
         /// <returns></returns>
-        public async Task<FileAttachment> UploadFile(string fileName, byte[] data, string mimeType)
+        public Task<FileAttachment> UploadFile(string fileName, byte[] data, string mimeType)
         {
             string url = "/file/v2/";
-            dynamic requestData = new
-            {
-                fileName,
-                data,
-                mimeType
-            };
-            return await _podio.PostMultipartFormData<FileAttachment>(url, data, fileName, mimeType);
+            return _podio.PostMultipartFormData<FileAttachment>(url, data, fileName, mimeType);
+        }
+
+        /// <summary>
+        ///     Uploads a new file
+        ///     <para>Podio API Reference: https://developers.podio.com/doc/files/upload-file-1004361 </para>
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="data"></param>
+        /// <param name="mimeType"></param>
+        /// <returns></returns>
+        public Task<FileAttachment> UploadFile(string fileName, Stream data, string mimeType)
+        {
+            string url = "/file/v2/";
+            return _podio.PostMultipartFormData<FileAttachment>(url, data, fileName, mimeType);
         }
 
         /// <summary>
@@ -74,7 +84,7 @@ namespace PodioAPI.Services
         /// </summary>
         /// <param name="fileUrl"></param>
         /// <returns></returns>
-        public async Task<FileAttachment> UploadFileFromUrl(string fileUrl)
+        public Task<FileAttachment> UploadFileFromUrl(string fileUrl)
         {
             string url = "/file/from_url/";
             dynamic requestData = new
@@ -82,7 +92,7 @@ namespace PodioAPI.Services
                 url = fileUrl
             };
 
-            return await _podio.Post<FileAttachment>(url, requestData);
+            return _podio.Post<FileAttachment>(url, requestData);
         }
 
         /// <summary>
@@ -190,7 +200,7 @@ namespace PodioAPI.Services
         /// <param name="sortBy">How the files should be sorted. Can be one of {"name", "created_on"} Default value: name</param>
         /// <param name="sortDesc">true for to sort in descending order, false in ascending Default value: false</param>
         /// <returns></returns>
-        public async Task<List<FileAttachment>> GetFiles(string attachedTo = null, string createdBy = null, string createdOn = null,
+        public Task<List<FileAttachment>> GetFiles(string attachedTo = null, string createdBy = null, string createdOn = null,
             string filetype = null, string hostedBy = null, int limit = 20, string sortBy = null, bool sortDesc = false)
         {
             string url = "/file/";
@@ -205,7 +215,7 @@ namespace PodioAPI.Services
                 {"sort_by", sortBy},
                 {"sort_desc", sortDesc.ToString()}
             };
-            return await _podio.Get<List<FileAttachment>>(url, requestData);
+            return _podio.Get<List<FileAttachment>>(url, requestData);
         }
 
         /// <summary>
@@ -236,7 +246,7 @@ namespace PodioAPI.Services
         /// <param name="sortBy">How the files should be sorted. Can be one of {"name", "created_on"} Default value: name</param>
         /// <param name="sortDesc">true for to sort in descending order, false in ascending Default value: false</param>
         /// <returns></returns>
-        public async Task<List<FileAttachment>> GetFilesOnApp(int appId, string attachedTo = null, string createdBy = null,
+        public Task<List<FileAttachment>> GetFilesOnApp(int appId, string attachedTo = null, string createdBy = null,
             string createdOn = null, string filetype = null, string hostedBy = null, int limit = 20, int offset = 0,
             string sortBy = null, bool sortDesc = false)
         {
@@ -253,7 +263,7 @@ namespace PodioAPI.Services
                 {"sort_by", sortBy},
                 {"sort_desc", sortDesc.ToString()}
             };
-            return await _podio.Get<List<FileAttachment>>(url, requestData);
+            return _podio.Get<List<FileAttachment>>(url, requestData);
         }
 
         /// <summary>
@@ -283,7 +293,7 @@ namespace PodioAPI.Services
         /// <param name="sortBy">How the files should be sorted. Can be one of {"name", "created_on"} Default value: name</param>
         /// <param name="sortDesc">true for to sort in descending order, false in ascending Default value: false</param>
         /// <returns></returns>
-        public async Task<List<FileAttachment>> GetFilesOnSpace(int spaceId, string attachedTo = null, string createdBy = null,
+        public Task<List<FileAttachment>> GetFilesOnSpace(int spaceId, string attachedTo = null, string createdBy = null,
             string createdOn = null, string filetype = null, string hostedBy = null, int limit = 20, int offset = 0,
             string sortBy = null, bool sortDesc = false)
         {
@@ -300,7 +310,7 @@ namespace PodioAPI.Services
                 {"sort_by", sortBy},
                 {"sort_desc", sortDesc.ToString()}
             };
-            return await _podio.Get<List<FileAttachment>>(url, requestData);
+            return _podio.Get<List<FileAttachment>>(url, requestData);
         }
 
         /// <summary>
@@ -309,14 +319,14 @@ namespace PodioAPI.Services
         /// </summary>
         /// <param name="fileAttachment"></param>
         /// <returns></returns>
-        public async Task<FileResponse> DownloadFile(FileAttachment fileAttachment)
+        public Task<FileResponse> DownloadFile(FileAttachment fileAttachment)
         {
             var fileLink = fileAttachment.Link;
             var options = new Dictionary<string, object>()
             {
                 {"file_download", true}
             };
-            return await _podio.Get<FileResponse>(fileLink, new Dictionary<string, string>(), true);
+            return _podio.Get<FileResponse>(fileLink, new Dictionary<string, string>(), true);
         }
     }
 }

@@ -34,10 +34,10 @@ namespace PodioAPI.Services
         /// <param name="refType"></param>
         /// <param name="refId"></param>
         /// <returns></returns>
-        public async Task<List<Grant>> GetGrantsOnObject(string refType, dynamic refId)
+        public Task<List<Grant>> GetGrantsOnObject(string refType, dynamic refId)
         {
             string url = string.Format("/grant/{0}/{1}/", refType, refId);
-            return  await _podio.Get<List<Grant>>(url);
+            return _podio.Get<List<Grant>>(url);
         }
 
         /// <summary>
@@ -47,10 +47,10 @@ namespace PodioAPI.Services
         /// <param name="refType"></param>
         /// <param name="refId"></param>
         /// <returns></returns>
-        public async Task<Grant> GetOwnGrantInformation(string refType, dynamic refId)
+        public Task<Grant> GetOwnGrantInformation(string refType, dynamic refId)
         {
             string url = string.Format("/grant/{0}/{1}/own", refType, refId);
-            return  await _podio.Get<Grant>(url);
+            return _podio.Get<Grant>(url);
         }
 
         /// <summary>
@@ -60,10 +60,10 @@ namespace PodioAPI.Services
         /// <param name="refType"></param>
         /// <param name="refId"></param>
         /// <param name="userId"></param>
-        public async Task<dynamic> RemoveGrant(string refType, dynamic refId, int userId)
+        public Task<dynamic> RemoveGrant(string refType, dynamic refId, int userId)
         {
             string url = string.Format("/grant/{0}/{1}/{2}", refType, refId, userId);
-           return await _podio.Delete<dynamic>(url);
+           return  _podio.Delete<dynamic>(url);
         }
 
         /// <summary>
@@ -73,10 +73,10 @@ namespace PodioAPI.Services
         /// <param name="spaceId"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<List<Grant>> GetGrantsToUserOnSpace(int spaceId, int userId)
+        public Task<List<Grant>> GetGrantsToUserOnSpace(int spaceId, int userId)
         {
             string url = string.Format("/grant/space/{0}/user/{0}/", spaceId, userId);
-            return  await _podio.Get<List<Grant>>(url);
+            return _podio.Get<List<Grant>>(url);
         }
 
         /// <summary>
@@ -85,10 +85,10 @@ namespace PodioAPI.Services
         /// </summary>
         /// <param name="orgId"></param>
         /// <returns></returns>
-        public async Task<List<Grant>> GetOwnGrantsOnOrg(int orgId)
+        public Task<List<Grant>> GetOwnGrantsOnOrg(int orgId)
         {
             string url = string.Format("/grant/org/{0}/own/", orgId);
-            return  await _podio.Get<List<Grant>>(url);
+            return _podio.Get<List<Grant>>(url);
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace PodioAPI.Services
         /// <param name="action">The action required of the people, either "view", "comment" or "rate", or left out</param>
         /// <param name="message">Any special message to the users</param>
         /// <returns></returns>
-        public async Task<CreatedGrant> CreateGrant(string refType, int refId, List<Ref> people, string action,
+        public Task<CreatedGrant> CreateGrant(string refType, int refId, List<Ref> people, string action,
             string message = null)
         {
             string url = string.Format("/grant/{0}/{1}", refType, refId);
@@ -111,7 +111,7 @@ namespace PodioAPI.Services
                 action = action,
                 message = message
             };
-            return  await _podio.Post<CreatedGrant>(url, requestData);
+            return _podio.Post<CreatedGrant>(url, requestData);
         }
     }
 }

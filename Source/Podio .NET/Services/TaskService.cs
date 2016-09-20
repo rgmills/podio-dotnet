@@ -22,14 +22,14 @@ namespace PodioAPI.Services
         /// </summary>
         /// <param name="limit"></param>
         /// <returns></returns>
-        public async Task<TaskSummary> GetTaskSummary(int limit = 4)
+        public Task<TaskSummary> GetTaskSummary(int limit = 4)
         {
             string url = "/task/summary";
             var requestData = new Dictionary<string, string>()
             {
                 {"limit", limit.ToString()}
             };
-            return await _podio.Get<TaskSummary>(url, requestData);
+            return  _podio.Get<TaskSummary>(url, requestData);
         }
 
         /// <summary>
@@ -39,14 +39,14 @@ namespace PodioAPI.Services
         /// <param name="orgId"></param>
         /// <param name="limit"></param>
         /// <returns></returns>
-        public async Task<TaskSummary> GetTaskSummaryForOrganization(int orgId, int limit = 4)
+        public Task<TaskSummary> GetTaskSummaryForOrganization(int orgId, int limit = 4)
         {
             string url = string.Format("/task/org/{0}/summary", orgId);
             var requestData = new Dictionary<string, string>()
             {
                 {"limit", limit.ToString()}
             };
-            return await _podio.Get<TaskSummary>(url, requestData);
+            return  _podio.Get<TaskSummary>(url, requestData);
         }
 
         /// <summary>
@@ -55,14 +55,14 @@ namespace PodioAPI.Services
         /// </summary>
         /// <param name="limit"></param>
         /// <returns></returns>
-        public async Task<TaskSummary> GetTaskSummaryForPersonal(int limit = 4)
+        public Task<TaskSummary> GetTaskSummaryForPersonal(int limit = 4)
         {
             string url = "/task/personal/summary";
             var requestData = new Dictionary<string, string>()
             {
                 {"limit", limit.ToString()}
             };
-            return await _podio.Get<TaskSummary>(url, requestData);
+            return  _podio.Get<TaskSummary>(url, requestData);
         }
 
         /// <summary>
@@ -73,14 +73,14 @@ namespace PodioAPI.Services
         /// <param name="refId"></param>
         /// <param name="limit"></param>
         /// <returns></returns>
-        public async Task<TaskSummary> GetTaskSummaryForReference(string refType, int refId, int limit = 4)
+        public Task<TaskSummary> GetTaskSummaryForReference(string refType, int refId, int limit = 4)
         {
             string url = string.Format("/task/{0}/{1}/summary", refType, refId);
             var requestData = new Dictionary<string, string>()
             {
                 {"limit", limit.ToString()}
             };
-            return await _podio.Get<TaskSummary>(url, requestData);
+            return  _podio.Get<TaskSummary>(url, requestData);
         }
 
         /// <summary>
@@ -90,14 +90,14 @@ namespace PodioAPI.Services
         /// <param name="spaceId"></param>
         /// <param name="limit"></param>
         /// <returns></returns>
-        public async Task<TaskSummary> GetTaskSummaryForSpace(int spaceId, int limit = 4)
+        public Task<TaskSummary> GetTaskSummaryForSpace(int spaceId, int limit = 4)
         {
             string url = string.Format("/task/space/{0}/summary", spaceId);
             var requestData = new Dictionary<string, string>()
             {
                 {"limit", limit.ToString()}
             };
-            return await _podio.Get<TaskSummary>(url, requestData);
+            return  _podio.Get<TaskSummary>(url, requestData);
         }
 
         /// <summary>
@@ -119,10 +119,10 @@ namespace PodioAPI.Services
         ///     <para>API Reference: https://developers.podio.com/doc/tasks/get-labels-151534 </para>
         /// </summary>
         /// <returns></returns>
-        public async Task<List<TaskLabel>> GetLabels()
+        public Task<List<TaskLabel>> GetLabels()
         {
             string url = "/task/label/";
-            return await _podio.Get<List<TaskLabel>>(url);
+            return  _podio.Get<List<TaskLabel>>(url);
         }
 
         /// <summary>
@@ -131,10 +131,10 @@ namespace PodioAPI.Services
         /// </summary>
         /// <param name="taskId"></param>
         /// <returns></returns>
-        public async Task<Models.Task> GetTask(int taskId)
+        public Task<Models.Task> GetTask(int taskId)
         {
             string url = string.Format("/task/{0}", taskId);
-            return await _podio.Get<Models.Task>(url);
+            return  _podio.Get<Models.Task>(url);
         }
 
         /// <summary>
@@ -226,7 +226,7 @@ namespace PodioAPI.Services
         ///     generated. Default value: false
         /// </param>
         /// <returns></returns>
-        public async Task<List<Models.Task>> CreateTask(string text, DateTime? dueDate = null, string description = null,
+        public Task<List<Models.Task>> CreateTask(string text, DateTime? dueDate = null, string description = null,
             int? responsible = null, bool isPrivate = true, string refType = null, int? refId = null, bool hook = true,
             bool silent = false)
         {
@@ -238,7 +238,7 @@ namespace PodioAPI.Services
                 Responsible = responsible,
                 Private = isPrivate
             };
-            return await CreateTask(task, refType, refId, hook, silent);
+            return  CreateTask(task, refType, refId, hook, silent);
         }
 
         /// <summary>
@@ -253,11 +253,11 @@ namespace PodioAPI.Services
         ///     generated. Default value: false
         /// </param>
         /// <returns></returns>
-        public async Task<Models.Task> UpdateTask(int taskId, TaskCreateUpdateRequest task, bool hook = true, bool silent = false)
+        public Task<Models.Task> UpdateTask(int taskId, TaskCreateUpdateRequest task, bool hook = true, bool silent = false)
         {
             string url = string.Format("/task/{0}", taskId);
             url = Utility.PrepareUrlWithOptions(url, new CreateUpdateOptions(silent, hook));
-            return await _podio.Put<Models.Task>(url, task);
+            return  _podio.Put<Models.Task>(url, task);
         }
 
         /// <summary>
@@ -492,7 +492,7 @@ namespace PodioAPI.Services
         ///     get task operation.
         /// </param>
         /// <returns></returns>
-        public async Task<List<Models.Task>> GetTasks(int? appId = null, bool? completed = null, int? completedBy = null,
+        public Task<List<Models.Task>> GetTasks(int? appId = null, bool? completed = null, int? completedBy = null,
             string completedOn = null, int? createdBy = null, string createdOn = null, int? createdVia = null,
             string dueDate = null, string externalId = null, bool? files = null, string grouping = null,
             int? label = null, int? limit = null, int offset = 0, int? org = null, bool? reassigned = null,
@@ -524,7 +524,7 @@ namespace PodioAPI.Services
                 {"space", space.ToStringOrNull()},
                 {"view", view}
             };
-            return await _podio.Get<List<Models.Task>>(url, requestData);
+            return  _podio.Get<List<Models.Task>>(url, requestData);
         }
 
         /// <summary>
@@ -536,7 +536,7 @@ namespace PodioAPI.Services
         ///     spaces.
         /// </param>
         /// <returns></returns>
-        public async Task<TaskReport> GetTaskTotals(int[] spaceIds = null)
+        public Task<TaskReport> GetTaskTotals(int[] spaceIds = null)
         {
             string url = "/task/total/";
             var requestData = new Dictionary<string, string>();
@@ -545,7 +545,7 @@ namespace PodioAPI.Services
                 string spaceIdCsv = Utility.ArrayToCSV(spaceIds, ";");
                 requestData.Add("space", spaceIdCsv);
             }
-            return await _podio.Get<TaskReport>(url, requestData);
+            return  _podio.Get<TaskReport>(url, requestData);
         }
 
         /// <summary>

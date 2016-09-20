@@ -19,10 +19,10 @@ namespace PodioAPI.Services
         /// </summary>
         /// <param name="flowId"></param>
         /// <returns></returns>
-        public async Task<Flow> GetFlowById(int flowId)
+        public Task<Flow> GetFlowById(int flowId)
         {
             string url = string.Format("/flow/{0}", flowId);
-            return await _podio.Get<Flow>(url);
+            return  _podio.Get<Flow>(url);
         }
 
         /// <summary>
@@ -32,10 +32,10 @@ namespace PodioAPI.Services
         /// <param name="refType"></param>
         /// <param name="refId"></param>
         /// <returns></returns>
-        public async Task<List<Flow>> GetFlows(string refType, int refId)
+        public Task<List<Flow>> GetFlows(string refType, int refId)
         {
             string url = string.Format("/flow/{0}/{1}/", refType, refId);
-            return await _podio.Get<List<Flow>>(url);
+            return  _podio.Get<List<Flow>>(url);
         }
 
         /// <summary>
@@ -43,10 +43,10 @@ namespace PodioAPI.Services
         ///     <para>Podio API Reference: https://developers.podio.com/doc/flows/delete-flow-32929229 </para>
         /// </summary>
         /// <param name="flowId"></param>
-        public async Task<dynamic> DeleteFlow(int flowId)
+        public Task<dynamic> DeleteFlow(int flowId)
         {
             string url = string.Format("/flow/{0}", flowId);
-            return await _podio.Delete<dynamic>(url);
+            return  _podio.Delete<dynamic>(url);
         }
 
         /// <summary>
@@ -55,10 +55,10 @@ namespace PodioAPI.Services
         /// </summary>
         /// <param name="flowId"></param>
         /// <returns></returns>
-        public async Task<Dictionary<string, FlowAttribute>> GetFlowContext(int flowId)
+        public Task<Dictionary<string, FlowAttribute>> GetFlowContext(int flowId)
         {
             string url = string.Format("/flow/{0}/context/", flowId);
-            return await _podio.Get<Dictionary<string, FlowAttribute>>(url);
+            return  _podio.Get<Dictionary<string, FlowAttribute>>(url);
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace PodioAPI.Services
         /// <param name="name"> The new name of the flow</param>
         /// <param name="effects">The list of effects to add</param>
         /// <param name="config">The configuration for the cause of the flow</param>
-        public async Task<dynamic> UpdateFlow(int flowId, string name, List<Effect> effects = null, dynamic config = null)
+        public Task<dynamic> UpdateFlow(int flowId, string name, List<Effect> effects = null, dynamic config = null)
         {
             string url = string.Format("/flow/{0}", flowId);
             dynamic requestData = new
@@ -103,7 +103,7 @@ namespace PodioAPI.Services
                 config = config,
                 effects = effects
             };
-            return await _podio.Put<dynamic>(url, requestData);
+            return  _podio.Put<dynamic>(url, requestData);
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace PodioAPI.Services
         /// <param name="cause">Details about the cause</param>
         /// <param name="effect">Details about the effect</param>
         /// <returns></returns>
-        public async Task<List<FlowAttribute>> GetPossibleAttributes(string refType, int refId, Cause cause, dynamic effect)
+        public Task<List<FlowAttribute>> GetPossibleAttributes(string refType, int refId, Cause cause, dynamic effect)
         {
             string url = string.Format("/flow/{0}/{1}/attributes/", refType, refId);
             dynamic requestData = new
@@ -123,7 +123,7 @@ namespace PodioAPI.Services
                 cause = cause,
                 effect = effect
             };
-            return await _podio.Post<List<FlowAttribute>>(url, requestData);
+            return  _podio.Post<List<FlowAttribute>>(url, requestData);
         }
     }
 }

@@ -44,7 +44,7 @@ namespace PodioAPI.Services
         /// <param name="widgetId"></param>
         /// <param name="title"></param>
         /// <param name="config"></param>
-        public async Task<dynamic> UpdateWidget(int widgetId, string title, dynamic config)
+        public Task<dynamic> UpdateWidget(int widgetId, string title, dynamic config)
         {
             string url = string.Format("/widget/{0}", widgetId);
             dynamic requestData = new
@@ -53,7 +53,7 @@ namespace PodioAPI.Services
                 config = config
             };
 
-             return await _podio.Put<dynamic>(url, requestData);
+             return  _podio.Put<dynamic>(url, requestData);
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace PodioAPI.Services
         public async Task<dynamic> UpdateWidgetOrder(string refType, string refId, List<int> widgetIds)
         {
             string url = string.Format("/widget/{0}/{1}/order", refType, refId);
-            return  await _podio.Put<dynamic>(url, widgetIds);
+            return _podio.Put<dynamic>(url, widgetIds);
         }
 
         /// <summary>
@@ -107,10 +107,10 @@ namespace PodioAPI.Services
         /// </summary>
         /// <param name="widgetId"></param>
         /// <returns></returns>
-        public async Task<Widget> GetWidget(int widgetId)
+        public Task<Widget> GetWidget(int widgetId)
         {
             string url = string.Format("/widget/{0}", widgetId);
-            return  await _podio.Get<Widget>(url);
+            return _podio.Get<Widget>(url);
         }
 
         /// <summary>
@@ -120,10 +120,10 @@ namespace PodioAPI.Services
         /// <param name="refType"></param>
         /// <param name="refId"></param>
         /// <returns></returns>
-        public async Task<List<Widget>> GetWidgets(string refType, int refId)
+        public Task<List<Widget>> GetWidgets(string refType, int refId)
         {
             string url = string.Format("/widget/{0}/{1}/", refType, refId);
-            return  await _podio.Get<List<Widget>>(url);
+            return _podio.Get<List<Widget>>(url);
         }
     }
 }

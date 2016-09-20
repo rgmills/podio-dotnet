@@ -18,10 +18,10 @@ namespace PodioAPI.Services
         /// </summary>
         /// <param name="actionId"></param>
         /// <returns></returns>
-        public async Task<Action> GetAction(int actionId)
+        public Task<Action> GetAction(int actionId)
         {
             string url = string.Format("/action/{0}", actionId);
-            return await _podio.Get<Action>(url);
+            return _podio.Get<Action>(url);
         }
     }
 }

@@ -5,6 +5,7 @@ using PodioAPI.Utils;
 using PodioAPI.Utils.Authentication;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -53,7 +54,7 @@ namespace PodioAPI
 
         #region Request Helpers
 
-        internal async Task<T> Get<T>(string url, Dictionary<string, string> requestData = null, bool isFileDownload = false, bool returnAsString = false)
+        internal Task<T> Get<T>(string url, Dictionary<string, string> requestData = null, bool isFileDownload = false, bool returnAsString = false)
             where T : new()
         {
             string queryString = Utility.DictionaryToQueryString(requestData);
@@ -63,10 +64,10 @@ namespace PodioAPI
             }
 
             var request = CreateHttpRequest(url, HttpMethod.Get, true, isFileDownload);
-            return await Request<T>(request, isFileDownload, returnAsString);
+            return Request<T>(request, isFileDownload, returnAsString);
         }
 
-        internal async Task<T> Post<T>(string url, dynamic requestData = null, bool isOAuthTokenRequest = false) where T : new()
+        internal Task<T> Post<T>(string url, dynamic requestData = null, bool isOAuthTokenRequest = false) where T : new()
         {
             var request = CreateHttpRequest(url, HttpMethod.Post, !isOAuthTokenRequest);
             if (isOAuthTokenRequest)
@@ -79,10 +80,10 @@ namespace PodioAPI
                 request.Content = new StringContent(jsonString, Encoding.UTF8, "application/json");
             }
 
-            return await Request<T>(request);
+            return Request<T>(request);
         }
 
-        internal async Task<T> PostMultipartFormData<T>(string url, byte[] fileData, string fileName, string mimeType) where T : new()
+        internal Task<T> PostMultipartFormData<T>(string url, byte[] fileData, string fileName, string mimeType) where T : new()
         {
             var request = CreateHttpRequest(url, HttpMethod.Post);
 
@@ -92,40 +93,61 @@ namespace PodioAPI
 
             request.Content = multipartFormContent;
 
-            return await Request<T>(request);
+            return Request<T>(request);
         }
 
-        internal async Task<T> Put<T>(string url, object requestData = null) where T : new()
+        internal Task<T> PostMultipartFormData<T>(string url, Stream fileData, string fileName, string mimeType) where T : new()
+        {
+            var request = CreateHttpRequest(url, HttpMethod.Post);
+
+            var multipartFormContent = new MultipartFormDataContent();
+            multipartFormContent.Add(new StreamContent(fileData), "source", fileName);
+            multipartFormContent.Add(new StringContent(fileName), "filename");
+
+            request.Content = multipartFormContent;
+
+            return Request<T>(request);
+        }
+
+        internal Task<T> Put<T>(string url, object requestData = null) where T : new()
         {
             var request = CreateHttpRequest(url, HttpMethod.Put);
             var jsonString = JSONSerializer.Serilaize(requestData);
             request.Content = new StringContent(jsonString, Encoding.UTF8, "application/json");
 
-            return await Request<T>(request);
+            return Request<T>(request);
         }
 
-        internal async Task<T> Delete<T>(string url, Dictionary<string, string> requestData = null) where T : new()
+        internal Task<T> Delete<T>(string url, Dictionary<string, string> requestData = null)
+            where T : new()
         {
             var request = CreateHttpRequest(url, HttpMethod.Delete);
-            if(requestData != null)
+            if (requestData != null)
+            {
                 request.Content = new FormUrlEncodedContent(requestData);
+            }
 
-            return await Request<T>(request);
+            return Request<T>(request);
         }
 
-        internal async Task<T> Request<T>(HttpRequestMessage httpRequest, bool isFileDownload = false, bool returnAsString = false) where T : new()
+        internal async Task<T> Request<T>(HttpRequestMessage httpRequest, bool isFileDownload = false, bool returnAsString = false)
+            where T : new()
         {
             var response = await HttpClient.SendAsync(httpRequest);
 
             // Get rate limits from header values
             if (response.Headers.Contains("X-Rate-Limit-Remaining"))
+            {
                 RateLimitRemaining = int.Parse(response.Headers.GetValues("X-Rate-Limit-Remaining").First());
+            }
             if (response.Headers.Contains("X-Rate-Limit-Limit"))
+            {
                 RateLimit = int.Parse(response.Headers.GetValues("X-Rate-Limit-Limit").First());
+            }
 
             if (response.IsSuccessStatusCode)
             {
-                if(isFileDownload)
+                if (isFileDownload)
                 {
                     var fileResponse = new FileResponse();
                     fileResponse.FileContents = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
@@ -139,7 +161,10 @@ namespace PodioAPI
                     var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                     if (returnAsString)
                     {
-                        var stringResponse = new StringResponse() { Data = responseBody };
+                        var stringResponse = new StringResponse
+                        {
+                            Data = responseBody
+                        };
                         return stringResponse.ChangeType<T>();
                     }
 
@@ -151,7 +176,7 @@ namespace PodioAPI
                 var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 var podioError = JSONSerializer.Deserialize<PodioError>(responseBody);
 
-                if (response.StatusCode == HttpStatusCode.Unauthorized && 
+                if (response.StatusCode == HttpStatusCode.Unauthorized &&
                     podioError.ErrorDescription == "expired_token" || podioError.Error == "invalid_token")
                 {
                     // If RefreshToken exists, refresh the access token and try the request again
@@ -169,7 +194,7 @@ namespace PodioAPI
                     else
                     {
                         throw new PodioAuthorizationException((int)response.StatusCode, podioError);
-                    } 
+                    }
                 }
                 else
                 {
@@ -192,16 +217,20 @@ namespace PodioAPI
             };
 
             if (isFileDownload)
+            {
                 request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
+            }
             else
+            {
                 request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            }
 
             if (addAuthorizationHeader)
             {
                 if (OAuth != null && !string.IsNullOrEmpty(OAuth.AccessToken))
                 {
                     request.Headers.Authorization = new AuthenticationHeaderValue("OAuth2", OAuth.AccessToken);
-                } 
+                }
             }
 
             return request;
@@ -255,7 +284,7 @@ namespace PodioAPI
         /// <param name="appId">AppId</param>
         /// <param name="appToken">AppToken</param>
         /// <returns>PodioOAuth object with OAuth data</returns>
-        public async Task<PodioOAuth> AuthenticateWithApp(int appId, string appToken)
+        public Task<PodioOAuth> AuthenticateWithApp(int appId, string appToken)
         {
             var authRequest = new Dictionary<string, string>()
             {
@@ -263,7 +292,7 @@ namespace PodioAPI
                 {"app_token", appToken},
                 {"grant_type", "app"}
             };
-            return await Authenticate(authRequest).ConfigureAwait(false);
+            return Authenticate(authRequest);
         }
 
         /// <summary>
@@ -273,7 +302,7 @@ namespace PodioAPI
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns>PodioOAuth object with OAuth data</returns>
-        public async Task<PodioOAuth> AuthenticateWithPassword(string username, string password)
+        public Task<PodioOAuth> AuthenticateWithPassword(string username, string password)
         {
             var authRequest = new Dictionary<string, string>()
             {
@@ -281,7 +310,7 @@ namespace PodioAPI
                 {"password", password},
                 {"grant_type", "password"}
             };
-            return await Authenticate(authRequest).ConfigureAwait(false);
+            return Authenticate(authRequest);
         }
 
         /// <summary>
@@ -291,7 +320,7 @@ namespace PodioAPI
         /// <param name="authorizationCode"></param>
         /// <param name="redirectUri"></param>
         /// <returns>PodioOAuth object with OAuth data</returns>
-        public async Task<PodioOAuth> AuthenticateWithAuthorizationCode(string authorizationCode, string redirectUri)
+        public Task<PodioOAuth> AuthenticateWithAuthorizationCode(string authorizationCode, string redirectUri)
         {
             var authRequest = new Dictionary<string, string>()
             {
@@ -299,7 +328,7 @@ namespace PodioAPI
                 {"redirect_uri", redirectUri},
                 {"grant_type", "authorization_code"}
             };
-            return await Authenticate(authRequest).ConfigureAwait(false);
+            return Authenticate(authRequest);
         }
 
         /// <summary>
@@ -308,14 +337,14 @@ namespace PodioAPI
         ///     <para>Podio API Reference: https://developers.podio.com/authentication </para>
         /// </summary>
         /// <returns>PodioOAuth object with OAuth data</returns>
-        public async Task<PodioOAuth> RefreshAccessToken()
+        public Task<PodioOAuth> RefreshAccessToken()
         {
             var authRequest = new Dictionary<string, string>()
             {
                 {"refresh_token", OAuth.RefreshToken},
                 {"grant_type", "refresh_token"}
             };
-            return await Authenticate(authRequest).ConfigureAwait(false);
+            return Authenticate(authRequest);
         }
 
         private async Task<PodioOAuth> Authenticate(Dictionary<string, string> attributes)

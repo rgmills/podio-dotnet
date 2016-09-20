@@ -26,8 +26,8 @@ namespace PodioAPI.Services
         public async Task<int> CreateContact(int spaceId, Contact contact)
         {
             string url = string.Format("/contact/space/{0}/", spaceId);
-            dynamic response = await  _podio.Post<dynamic>(url, contact);
-            return (int) response["profile_id"];
+            dynamic response = await _podio.Post<dynamic>(url, contact);
+            return (int)response["profile_id"];
         }
 
         /// <summary>
@@ -36,10 +36,10 @@ namespace PodioAPI.Services
         /// </summary>
         /// <param name="profileId"></param>
         /// <param name="contact"></param>
-        public async Task<dynamic> UpdateContact(int profileId, Contact contact)
+        public Task<dynamic> UpdateContact(int profileId, Contact contact)
         {
             string url = string.Format("/contact/{0}", profileId);
-            return await _podio.Put<dynamic>(url, contact);
+            return _podio.Put<dynamic>(url, contact);
         }
 
         /// <summary>
@@ -47,11 +47,11 @@ namespace PodioAPI.Services
         ///     <para>Podio API Reference: https://developers.podio.com/doc/contacts/delete-contact-s-60560 </para>
         /// </summary>
         /// <param name="profileIds"></param>
-        public async Task<dynamic> DeleteContacts(int[] profileIds)
+        public Task<dynamic> DeleteContacts(int[] profileIds)
         {
             string profileIdCSV = Utility.ArrayToCSV(profileIds);
             string url = string.Format("/contact/{0}", profileIdCSV);
-            return await  _podio.Delete<dynamic>(url);
+            return _podio.Delete<dynamic>(url);
         }
 
         /// <summary>
@@ -59,10 +59,10 @@ namespace PodioAPI.Services
         ///     <para>Podio API Reference: https://developers.podio.com/doc/contacts/get-contact-totals-v3-34629208 </para>
         /// </summary>
         /// <returns></returns>
-        public async Task<ContactTotal> GetContactTotals()
+        public Task<ContactTotal> GetContactTotals()
         {
             string url = "/contact/totals/v3/";
-            return await  _podio.Get<ContactTotal>(url);
+            return _podio.Get<ContactTotal>(url);
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace PodioAPI.Services
         /// <param name="text"></param>
         /// <param name="limit"></param>
         /// <returns></returns>
-        public async Task<List<string>> GetSkills(string text, int limit = 12)
+        public Task<List<string>> GetSkills(string text, int limit = 12)
         {
             var requestData = new Dictionary<string, string>()
             {
@@ -80,7 +80,7 @@ namespace PodioAPI.Services
                 {"text", text}
             };
             string url = "/contact/skill/";
-            return await  _podio.Get<List<string>>(url, requestData);
+            return _podio.Get<List<string>>(url, requestData);
         }
 
         /// <summary>
@@ -92,8 +92,8 @@ namespace PodioAPI.Services
         public async Task<int> GetSpaceContactTotals(int SpaceId)
         {
             string url = string.Format("/contact/space/{0}/totals/space", SpaceId);
-            dynamic response = await  _podio.Get<dynamic>(url);
-            return (int) response["total"];
+            dynamic response = await _podio.Get<dynamic>(url);
+            return (int)response["total"];
         }
 
         /// <summary>
@@ -101,10 +101,10 @@ namespace PodioAPI.Services
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<Contact> GetUserContact(int userId)
+        public Task<Contact> GetUserContact(int userId)
         {
             string url = string.Format("/contact/user/{0}", userId);
-            return await  _podio.Get<Contact>(url);
+            return _podio.Get<Contact>(url);
         }
 
         /// <summary>
@@ -125,9 +125,9 @@ namespace PodioAPI.Services
             var contacts = new List<Contact>();
 
             if (profileIds.Length > 1)
-                contacts = await  _podio.Get<List<Contact>>(url, requestData);
+                contacts = await _podio.Get<List<Contact>>(url, requestData);
             else
-                contacts.Add(await  _podio.Get<Contact>(url, requestData));
+                contacts.Add(await _podio.Get<Contact>(url, requestData));
 
             return contacts;
         }
@@ -155,7 +155,7 @@ namespace PodioAPI.Services
         /// </param>
         /// <param name="type">Determines the way the result is returned. Valid options are "mini" and "full". Default value: mini</param>
         /// <returns></returns>
-        public async Task<List<Contact>> GetAllContacts(Dictionary<string, string> fields = null, string contactType = "user",
+        public Task<List<Contact>> GetAllContacts(Dictionary<string, string> fields = null, string contactType = "user",
             string externalId = null, int? limit = null, int? offset = null, string required = null,
             bool excludeSelf = true, string order = "name", string type = "mini")
         {
@@ -178,7 +178,7 @@ namespace PodioAPI.Services
             else
                 requestData = parameters;
 
-            return await  _podio.Get<List<Contact>>(url, requestData);
+            return _podio.Get<List<Contact>>(url, requestData);
         }
 
         /// <summary>
@@ -206,7 +206,7 @@ namespace PodioAPI.Services
         /// </param>
         /// <param name="type">Determines the way the result is returned. Valid options are "mini" and "full". Default value: mini</param>
         /// <returns></returns>
-        public async Task<List<Contact>> GetOrganizationContacts(int orgId, Dictionary<string, string> fields = null,
+        public Task<List<Contact>> GetOrganizationContacts(int orgId, Dictionary<string, string> fields = null,
             string contactType = "user", string externalId = null, int? limit = null, int? offset = null,
             string required = null, bool excludeSelf = true, string order = "name", string type = "mini")
         {
@@ -229,7 +229,7 @@ namespace PodioAPI.Services
             else
                 requestData = parameters;
 
-            return await _podio.Get<List<Contact>>(url, requestData);
+            return _podio.Get<List<Contact>>(url, requestData);
         }
 
         /// <summary>
@@ -257,7 +257,7 @@ namespace PodioAPI.Services
         /// </param>
         /// <param name="type">Determines the way the result is returned. Valid options are "mini" and "full". Default value: mini</param>
         /// <returns></returns>
-        public async Task<List<Contact>> GetSpaceContacts(int spaceId, Dictionary<string, string> fields = null,
+        public Task<List<Contact>> GetSpaceContacts(int spaceId, Dictionary<string, string> fields = null,
             string contactType = "user", string externalId = null, int? limit = null, int? offset = null,
             string required = null, bool excludeSelf = true, string order = "name", string type = "mini")
         {
@@ -280,7 +280,7 @@ namespace PodioAPI.Services
             else
                 requestData = parameters;
 
-            return await _podio.Get<List<Contact>>(url, requestData);
+            return _podio.Get<List<Contact>>(url, requestData);
         }
 
         /// <summary>
@@ -296,7 +296,7 @@ namespace PodioAPI.Services
         ///     Default value: name
         /// </param>
         /// <returns></returns>
-        public async Task<List<Contact>> GetSpaceContactsOnApp(int appId, Dictionary<string, string> fields = null,
+        public Task<List<Contact>> GetSpaceContactsOnApp(int appId, Dictionary<string, string> fields = null,
             int? limit = null, int? offset = null, string order = "name")
         {
             string url = string.Format("/contact/app/{0}/", appId);
@@ -313,7 +313,7 @@ namespace PodioAPI.Services
             else
                 requestData = parameters;
 
-            return await  _podio.Get<List<Contact>>(url, requestData);
+            return _podio.Get<List<Contact>>(url, requestData);
         }
 
         /// <summary>
@@ -323,10 +323,10 @@ namespace PodioAPI.Services
         /// <param name="userId"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        public async Task<List<string>> GetUserContactField(int userId, string key)
+        public Task<List<string>> GetUserContactField(int userId, string key)
         {
             string url = string.Format("/contact/user/{0}/{1}", userId, key);
-            return await  _podio.Get<List<string>>(url);
+            return _podio.Get<List<string>>(url);
         }
 
         /// <summary>
@@ -335,10 +335,10 @@ namespace PodioAPI.Services
         /// </summary>
         /// <param name="profileId"></param>
         /// <returns></returns>
-        public async Task<StringResponse> GetvCard(int profileId)
+        public Task<StringResponse> GetvCard(int profileId)
         {
             string url = string.Format("/contact/{0}/vcard", profileId);
-            return await  _podio.Get<StringResponse>(url, returnAsString: true);
+            return _podio.Get<StringResponse>(url, returnAsString: true);
         }
 
         /// <summary>
@@ -348,14 +348,14 @@ namespace PodioAPI.Services
         /// <param name="profileId"></param>
         /// <param name="key"></param>
         /// <param name="value">The new value for the profile field.</param>
-        public async Task<dynamic> UpdateContactField(int profileId, string key, string value)
+        public Task<dynamic> UpdateContactField(int profileId, string key, string value)
         {
             string url = string.Format("/contact/{0}/{1}", profileId, key);
             dynamic requestData = new
             {
                 value = value
             };
-            return await  _podio.Put<dynamic>(url, requestData);
+            return _podio.Put<dynamic>(url, requestData);
         }
     }
 }
